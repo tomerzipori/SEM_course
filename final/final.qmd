@@ -1,0 +1,87 @@
+---
+title: "SEM Course - Final Project"
+author: "Noa Valansi & Tomer Zipori"
+format: html
+editor: visual
+---
+
+# Setup
+
+```{r}
+library(tidyverse)
+library(lavaan)
+library(ggfortify)
+library(tidySEM)
+```
+
+```{r}
+data <- lavaan::HolzingerSwineford1939 |>
+  mutate(age = scale(ageyr * 12 + agemo)[,1]) |>
+  rename(Visual_perception = x1,
+         Cubes = x2,
+         Lozenges = x3,
+         Paragraph_comprehension = x4,
+         Sentence_completion = x5,
+         Word_meaning = x6,
+         Speeded_addition = x7,
+         Speeded_counting_of_dots = x8,
+         Speeded_discrimination_straight_and_curved_capitals = x9)
+```
+
+## PCA
+
+```{r}
+data_for_pca <- data[,(ncol(data)-8):ncol(data)-1]
+```
+
+```{r}
+pca_res <- prcomp(data_for_pca, scale. = TRUE)
+
+autoplot(pca_res)
+```
+
+```{r}
+autoplot(pca_res, data = data_for_pca,
+         loadings = TRUE, loadings.colour = 'blue',
+         loadings.label = TRUE, loadings.label.size = 3)
+```
+
+```{r}
+model <- '
+  ## latent variable definitions (CFA)
+  Language =~ Paragraph_comprehension + Sentence_completion + Word_meaning
+  Visual =~ Visual_perception + Cubes
+  Speed =~ Speeded_addition + Speeded_counting_of_dots + Speeded_discrimination_straight_and_curved_capitals
+  
+  ## covariances
+  Language ~~ Visual
+  Speed ~~ Language + Visual + age
+   
+  ## errors
+   
+  ## autocorrelations
+  
+  ## self-regression (do not forget!)
+  age ~ 1 * age
+'
+```
+
+```{r}
+fit_meas <- cfa(model, data = data)
+summary(fit_meas, standardize = TRUE)
+```
+
+```{r}
+lay <- get_layout(
+  "Visual_perception", "Cubes", NA, "Paragraph_comprehension", "Sentence_completion", "Word_meaning", NA, "Speeded_addition", "Speeded_counting_of_dots", "Speeded_discrimination_straight_and_curved_capitals",
+  "Visual",   NA,  NA,  "Language", NA, NA, NA,"Speed", NA,
+  "age",
+  rows = 2
+)
+```
+
+```{r}
+graph_sem(fit_meas, layout = lay, angle = 90)
+```
+
+
