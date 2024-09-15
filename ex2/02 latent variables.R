@@ -93,25 +93,12 @@ summary(fit_meas, standardize = TRUE)
 # But this can cause issues sometimes (often with structural models), so we will
 # not be using this much.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 # Reliability -------------------------------------------------------------
 
 # To measure the reliability of our factors, we need to fit the same model in a
 # slightly different way: Each observed variable (non indicator) needs to be
 # used to define a single-indicator latent variable. (This has no effect on
-# model fit / df, it is needed purley for technical reasons).
+# model fit / df, it is needed purely for technical reasons).
 
 
 mod_lat_only <- '

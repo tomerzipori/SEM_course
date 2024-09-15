@@ -15,61 +15,57 @@ library(tidySEM)
 ```
 
 ```{r}
-data <- lavaan::HolzingerSwineford1939 |>
-  mutate(age = scale(ageyr * 12 + agemo)[,1]) |>
-  rename(Visual_perception = x1,
-         Cubes = x2,
-         Lozenges = x3,
-         Paragraph_comprehension = x4,
-         Sentence_completion = x5,
-         Word_meaning = x6,
-         Speeded_addition = x7,
-         Speeded_counting_of_dots = x8,
-         Speeded_discrimination_straight_and_curved_capitals = x9)
+data <- read.csv("../final/MentalHealthSurvey.csv")
+
+data_clean <- data |>
+  select(where(is.numeric)) |>
+  mutate(isolation_rev = max(isolation) - isolation)
 ```
 
-## PCA
+Latent variables - Lifestyle factors * Clinical measurements = Functional assessment/ADL
 
 ```{r}
-data_for_pca <- data[,(ncol(data)-8):ncol(data)-1]
-```
-
-```{r}
-pca_res <- prcomp(data_for_pca, scale. = TRUE)
-
-autoplot(pca_res)
-```
-
-```{r}
-autoplot(pca_res, data = data_for_pca,
-         loadings = TRUE, loadings.colour = 'blue',
-         loadings.label = TRUE, loadings.label.size = 3)
-```
-
-```{r}
-model <- '
+meaurement_model <- '
   ## latent variable definitions (CFA)
-  Language =~ Paragraph_comprehension + Sentence_completion + Word_meaning
-  Visual =~ Visual_perception + Cubes
-  Speed =~ Speeded_addition + Speeded_counting_of_dots + Speeded_discrimination_straight_and_curved_capitals
-  
-  ## covariances
-  Language ~~ Visual
-  Speed ~~ Language + Visual + age
+  Stress =~ academic_workload + academic_pressure
+  Well_being =~ depression + anxiety
+
+  ## Covariances
+  Well_being ~~ Stress
+
+  ## Regressions
    
   ## errors
    
   ## autocorrelations
   
   ## self-regression (do not forget!)
-  age ~ 1 * age
 '
 ```
 
 ```{r}
-fit_meas <- cfa(model, data = data)
-summary(fit_meas, standardize = TRUE)
+fit_meas <- cfa(meaurement_model, data = data_clean)
+
+summary(fit_meas, fit.measures = TRUE, standardize = F)
 ```
+
+```{r}
+fitMeasures(fit_meas, output = "text",
+            fit.measures = c("nfi","nnfi","tli","cfi","gfi","rmsea"))
+```
+
+```{r}
+anova(fit_meas)
+```
+
+```{r}
+modificationindices(fit_meas, sort. = TRUE, maximum.number = 5)
+```
+
+```{r}
+semTools::reliability(fit_meas)
+```
+
 
 ```{r}
 lay <- get_layout(
@@ -81,7 +77,93 @@ lay <- get_layout(
 ```
 
 ```{r}
-graph_sem(fit_meas, layout = lay, angle = 90)
+graph_sem(fit_meas, angle = 90)
 ```
 
+# Mediation
+
+## Hypothesized model
+
+```{r}
+hypothesized_model <- '
+  ## latent variable definitions (CFA)
+  Stress =~ academic_workload + academic_pressure
+  Well_being =~ depression + anxiety
+
+  ## Covariances
+
+  ## Regressions
+  Well_being ~ Stress
+  study_satisfaction ~ Stress + Well_being
+   
+  ## effects
+   
+  ## autocorrelations
+  
+  ## self-regression (do not forget!)
+'
+```
+
+```{r}
+hypothesized_fit <- sem(hypothesized_model, data = data_clean)
+```
+
+```{r}
+summary(hypothesized_fit)
+```
+
+```{r}
+anova(hypothesized_fit)
+```
+
+```{r}
+graph_sem(hypothesized_fit,
+          edges = get_edges(hypothesized_fit, label = "est_std"),
+          angle = 90)
+```
+
+## Only Stress
+
+```{r}
+strict_hypothesized_model <- '
+  ## latent variable definitions (CFA)
+  Stress =~ academic_workload + academic_pressure
+  Well_being =~ depression + anxiety
+
+  ## Covariances
+  Well_being ~~ 0 * study_satisfaction
+
+  ## Regressions
+  Well_being ~ Stress
+  study_satisfaction ~ Stress
+   
+  ## effects
+   
+  ## autocorrelations
+  
+  ## self-regression (do not forget!)
+'
+```
+
+```{r}
+strict_hypothesized_fit <- sem(strict_hypothesized_model, data = data_clean)
+```
+
+```{r}
+summary(strict_hypothesized_fit)
+```
+
+```{r}
+anova(strict_hypothesized_fit)
+```
+
+```{r}
+graph_sem(strict_hypothesized_fit,
+          edges = get_edges(strict_hypothesized_fit, label = "est_std"),
+          angle = 90)
+```
+
+```{r}
+anova(hypothesized_fit, strict_hypothesized_fit)
+```
 
