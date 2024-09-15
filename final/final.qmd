@@ -1,7 +1,17 @@
 ---
 title: "SEM Course - Final Project"
 author: "Noa Valansi & Tomer Zipori"
-format: html
+date: 2024-09-15
+execute: 
+  warning: false
+  message: false
+  cache: true
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    toc-location: right
 editor: visual
 ---
 
@@ -14,21 +24,26 @@ library(ggfortify)
 library(tidySEM)
 ```
 
+# Data loading and wrangling
+
 ```{r}
 data <- read.csv("../final/MentalHealthSurvey.csv")
 
 data_clean <- data |>
-  select(where(is.numeric)) |>
-  mutate(isolation_rev = max(isolation) - isolation)
+  select(where(is.numeric))
 ```
 
-Latent variables - Lifestyle factors * Clinical measurements = Functional assessment/ADL
+We create two latent variables:
+* (reversed) Well_being from `depression`, `anxiety` and `isolation`.
+* Stress from `academic_workload` and `academic_pressure`.
+
+# Measurement model
 
 ```{r}
 meaurement_model <- '
   ## latent variable definitions (CFA)
   Stress =~ academic_workload + academic_pressure
-  Well_being =~ depression + anxiety
+  Well_being =~ depression + anxiety + isolation
 
   ## Covariances
   Well_being ~~ Stress
@@ -43,44 +58,66 @@ meaurement_model <- '
 '
 ```
 
+## Model fitting and output
+
 ```{r}
 fit_meas <- cfa(meaurement_model, data = data_clean)
 
 summary(fit_meas, fit.measures = TRUE, standardize = F)
 ```
 
+Factors constructing both latent variables show significant loadings, indicating that they contribute to the measurement of them. As can be expected, positive and significant correlation between the two latent variables.
+
+## Goodness of fit
+
 ```{r}
 fitMeasures(fit_meas, output = "text",
             fit.measures = c("nfi","nnfi","tli","cfi","gfi","rmsea"))
 ```
 
+Model seems to fit the data well.
+
+Comparing the measurement model to the saturated (just identified) model:
+
 ```{r}
 anova(fit_meas)
 ```
+
+Measurement model does not fit significantly better to the data than the saturated model.
+
+Using `modificationindices()` to see what changes to the model could improve it's fit:
 
 ```{r}
 modificationindices(fit_meas, sort. = TRUE, maximum.number = 5)
 ```
 
+It seems that estimating the covariance between `academic_workload` and `isolation`, and between `depression` and `anxiety`, as well as adding `isolation` to the measurement of `Stress` will improve model fit.
+
+Reliability of each latent variable measurement:
+
 ```{r}
 semTools::reliability(fit_meas)
 ```
 
+## Visualization
+
+Measurement of `Well_being` is more reliable than the measurement of `Stress`. 
 
 ```{r}
 lay <- get_layout(
-  "Visual_perception", "Cubes", NA, "Paragraph_comprehension", "Sentence_completion", "Word_meaning", NA, "Speeded_addition", "Speeded_counting_of_dots", "Speeded_discrimination_straight_and_curved_capitals",
-  "Visual",   NA,  NA,  "Language", NA, NA, NA,"Speed", NA,
-  "age",
+  "academic_pressure", "academic_workload", "isolation", "anxiety", "depression",
+  "Stress", NA, NA, NA, "Well_being",
   rows = 2
 )
 ```
 
 ```{r}
-graph_sem(fit_meas, angle = 90)
+graph_sem(fit_meas, angle = 90, layout = lay)
 ```
 
-# Mediation
+# Hypothesis 1 - Mediation
+
+Hypothesis 1 - A mediation model: Stress predicts bad well being, which in turn predict lower study satisfaction.
 
 ## Hypothesized model
 
@@ -88,7 +125,7 @@ graph_sem(fit_meas, angle = 90)
 hypothesized_model <- '
   ## latent variable definitions (CFA)
   Stress =~ academic_workload + academic_pressure
-  Well_being =~ depression + anxiety
+  Well_being =~ depression + anxiety + isolation
 
   ## Covariances
 
@@ -112,30 +149,60 @@ hypothesized_fit <- sem(hypothesized_model, data = data_clean)
 summary(hypothesized_fit)
 ```
 
+Direct path - `Stress` is not significantly correlated with `study satisfaction` when controlling for `well being`.
+
+Indirect path - `Well being` is significantly correlated with `Stress`, and it is also significantly correlated with `study satisfaction`.
+
+### Goodness of fit
+
+```{r}
+fitMeasures(hypothesized_fit, output = "text",
+            fit.measures = c("nfi","nnfi","tli","cfi","gfi","rmsea"))
+```
+
+Good model fit.
+
 ```{r}
 anova(hypothesized_fit)
+```
+
+The hypothesized model is not a better fit than the saturated model.
+
+### Visualiztion
+
+```{r}
+lay <- get_layout(
+  NA, NA, "depression", "anxiety", "isolation", NA,
+  NA, NA, NA, "Well_being", NA, NA,
+  NA, "Stress", NA, NA, NA, "study_satisfaction",
+  "academic_pressure", NA, "academic_workload", NA, NA, NA,
+  rows = 4
+)
 ```
 
 ```{r}
 graph_sem(hypothesized_fit,
           edges = get_edges(hypothesized_fit, label = "est_std"),
-          angle = 90)
+          angle = 90,
+          layout = lay)
 ```
 
-## Only Stress
+Fixing the correlation between `Well_being` and `study_satisfaction` to 0, nullifying the indirect path.
+
+## Restricted model
 
 ```{r}
-strict_hypothesized_model <- '
+restricted_hypothesized_model <- '
   ## latent variable definitions (CFA)
   Stress =~ academic_workload + academic_pressure
-  Well_being =~ depression + anxiety
+  Well_being =~ depression + anxiety + isolation
 
   ## Covariances
   Well_being ~~ 0 * study_satisfaction
 
   ## Regressions
   Well_being ~ Stress
-  study_satisfaction ~ Stress
+  study_satisfaction ~ 0 * Well_being + Stress
    
   ## effects
    
@@ -146,24 +213,147 @@ strict_hypothesized_model <- '
 ```
 
 ```{r}
-strict_hypothesized_fit <- sem(strict_hypothesized_model, data = data_clean)
+restricted_hypothesized_fit <- sem(restricted_hypothesized_model, data = data_clean)
 ```
 
 ```{r}
-summary(strict_hypothesized_fit)
+summary(restricted_hypothesized_fit)
+```
+
+### Goodness of fit
+
+```{r}
+fitMeasures(restricted_hypothesized_fit, output = "text",
+            fit.measures = c("nfi","nnfi","tli","cfi","gfi","rmsea"))
+```
+
+Comparing between the hypothesized model and the restricted model.
+
+```{r}
+anova(restricted_hypothesized_fit, hypothesized_fit)
+```
+
+### Visualiztion
+
+The restricted model is a significantly better fit. The simpler model, without the indirect path is better. 
+
+```{r}
+graph_sem(restricted_hypothesized_fit,
+          edges = get_edges(restricted_hypothesized_fit, label = "est_std"),
+          angle = 90,
+          layout = lay)
+```
+
+# Hypothesis 2 - Group analysis (interaction)
+
+Do older students deal better with stress, do the correlation between `Stress` and `Well_being` differ for different ages?
+
+Creating a categorical variable for age because `lavaan` doesn't support interaction terms for latent variables.
+```{r}
+data_clean <- data_clean |>
+  mutate(age_cat = case_when(age < median(age) ~ "young",
+                             age >= median(age) ~ "old",
+                             .default = NA))
+```
+
+## Model fitting
+
+```{r}
+interaction_hypothesized_model <- '
+  ## latent variable definitions (CFA)
+  Stress =~ academic_workload + academic_pressure
+  Well_being =~ depression + anxiety + isolation
+
+  ## Covariances
+
+  ## Regressions
+  Well_being ~ Stress
+   
+  ## effects
+   
+  ## autocorrelations
+  
+  ## self-regression (do not forget!)
+'
 ```
 
 ```{r}
-anova(strict_hypothesized_fit)
+interaction_hypothesized_fit <- sem(interaction_hypothesized_model, data = data_clean,
+                                    group = "age_cat")
 ```
 
 ```{r}
-graph_sem(strict_hypothesized_fit,
-          edges = get_edges(strict_hypothesized_fit, label = "est_std"),
+summary(interaction_hypothesized_fit)
+```
+
+### Goodness of fit
+
+```{r}
+fitMeasures(interaction_hypothesized_fit, output = "text",
+            fit.measures = c("nfi","nnfi","tli","cfi","gfi","rmsea"))
+```
+
+Very good fit.
+
+Comparing to the saturated model:
+
+```{r}
+anova(interaction_hypothesized_fit)
+```
+
+### Visualiztion
+
+The model is not significantly better than the saturated model.
+
+```{r}
+lay <- get_layout(NA, "Stress", NA, NA, "Well_being", NA,
+                  "academic_pressure", NA, "academic_workload", "depression", "anxiety", "isolation",
+                  rows = 2)
+```
+
+
+```{r}
+graph_sem(interaction_hypothesized_fit, 
+          edges = get_edges(interaction_hypothesized_fit, label = "est_std"),
+          nodes = get_nodes(interaction_hypothesized_fit, label = "name"),
+          layout = lay,
           angle = 90)
 ```
 
+As hypothesized, correlation between `Stress` and `Well_being` is stronger among young students. Is it significant?
+
+### Comparison of parameters
+
 ```{r}
-anova(hypothesized_fit, strict_hypothesized_fit)
+interaction_hypothesized_model_comp <- '
+  ## latent variable definitions (CFA)
+  Stress =~ academic_workload + academic_pressure
+  Well_being =~ depression + anxiety + isolation
+
+  ## Covariances
+
+  ## Regressions
+  Well_being ~ c(Oeffect, Yeffect) * Stress
+  
+  ## Computed estimates
+  gender_effect_diff := Oeffect - Yeffect
+   
+  ## effects
+   
+  ## autocorrelations
+  
+  ## self-regression (do not forget!)
+'
 ```
+
+```{r}
+interaction_hypothesized_fit <- sem(interaction_hypothesized_model_comp, data = data_clean,
+                                    group = "age_cat")
+```
+
+```{r}
+summary(interaction_hypothesized_fit)
+```
+
+Estimated parameters for young students ($b=1.814$) and old students ($b=1.07$) does not differ significantly ($d=-0.745$, $p=0.397$).
 

@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.555">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Noa Valansi &amp; Tomer Zipori">
+<meta name="dcterms.date" content="2024-09-15">
+
+<title>SEM Course - Final Project</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="final_files/libs/clipboard/clipboard.min.js"></script>
+<script src="final_files/libs/quarto-html/quarto.js"></script>
+<script src="final_files/libs/quarto-html/popper.min.js"></script>
+<script src="final_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="final_files/libs/quarto-html/anchor.min.js"></script>
+<link href="final_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="final_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="final_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="final_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="final_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#setup" id="toc-setup" class="nav-link active" data-scroll-target="#setup">Setup</a></li>
+  <li><a href="#data-loading-and-wrangling" id="toc-data-loading-and-wrangling" class="nav-link" data-scroll-target="#data-loading-and-wrangling">Data loading and wrangling</a></li>
+  <li><a href="#measurement-model" id="toc-measurement-model" class="nav-link" data-scroll-target="#measurement-model">Measurement model</a>
+  <ul class="collapse">
+  <li><a href="#model-fitting-and-output" id="toc-model-fitting-and-output" class="nav-link" data-scroll-target="#model-fitting-and-output">Model fitting and output</a></li>
+  <li><a href="#goodness-of-fit" id="toc-goodness-of-fit" class="nav-link" data-scroll-target="#goodness-of-fit">Goodness of fit</a></li>
+  <li><a href="#visualization" id="toc-visualization" class="nav-link" data-scroll-target="#visualization">Visualization</a></li>
+  </ul></li>
+  <li><a href="#hypothesis-1---mediation" id="toc-hypothesis-1---mediation" class="nav-link" data-scroll-target="#hypothesis-1---mediation">Hypothesis 1 - Mediation</a>
+  <ul class="collapse">
+  <li><a href="#hypothesized-model" id="toc-hypothesized-model" class="nav-link" data-scroll-target="#hypothesized-model">Hypothesized model</a>
+  <ul class="collapse">
+  <li><a href="#goodness-of-fit-1" id="toc-goodness-of-fit-1" class="nav-link" data-scroll-target="#goodness-of-fit-1">Goodness of fit</a></li>
+  <li><a href="#visualiztion" id="toc-visualiztion" class="nav-link" data-scroll-target="#visualiztion">Visualiztion</a></li>
+  </ul></li>
+  <li><a href="#restricted-model" id="toc-restricted-model" class="nav-link" data-scroll-target="#restricted-model">Restricted model</a>
+  <ul class="collapse">
+  <li><a href="#goodness-of-fit-2" id="toc-goodness-of-fit-2" class="nav-link" data-scroll-target="#goodness-of-fit-2">Goodness of fit</a></li>
+  <li><a href="#visualiztion-1" id="toc-visualiztion-1" class="nav-link" data-scroll-target="#visualiztion-1">Visualiztion</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#hypothesis-2---group-analysis-interaction" id="toc-hypothesis-2---group-analysis-interaction" class="nav-link" data-scroll-target="#hypothesis-2---group-analysis-interaction">Hypothesis 2 - Group analysis (interaction)</a>
+  <ul class="collapse">
+  <li><a href="#model-fitting" id="toc-model-fitting" class="nav-link" data-scroll-target="#model-fitting">Model fitting</a>
+  <ul class="collapse">
+  <li><a href="#goodness-of-fit-3" id="toc-goodness-of-fit-3" class="nav-link" data-scroll-target="#goodness-of-fit-3">Goodness of fit</a></li>
+  <li><a href="#visualiztion-2" id="toc-visualiztion-2" class="nav-link" data-scroll-target="#visualiztion-2">Visualiztion</a></li>
+  <li><a href="#comparison-of-parameters" id="toc-comparison-of-parameters" class="nav-link" data-scroll-target="#comparison-of-parameters">Comparison of parameters</a></li>
+  </ul></li>
+  </ul></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">SEM Course - Final Project</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Noa Valansi &amp; Tomer Zipori </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">September 15, 2024</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="setup" class="level1">
+<h1>Setup</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lavaan)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggfortify)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidySEM)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="data-loading-and-wrangling" class="level1">
+<h1>Data loading and wrangling</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"../final/MentalHealthSurvey.csv"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>data_clean <span class="ot">&lt;-</span> data <span class="sc">|&gt;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">where</span>(is.numeric))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We create two latent variables: * (reversed) Well_being from <code>depression</code>, <code>anxiety</code> and <code>isolation</code>. * Stress from <code>academic_workload</code> and <code>academic_pressure</code>.</p>
+</section>
+<section id="measurement-model" class="level1">
+<h1>Measurement model</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>meaurement_model <span class="ot">&lt;-</span> <span class="st">'</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="st">  ## latent variable definitions (CFA)</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="st">  Stress =~ academic_workload + academic_pressure</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="st">  Well_being =~ depression + anxiety + isolation</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="st">  ## Covariances</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="st">  Well_being ~~ Stress</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="st">  ## Regressions</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="st">   </span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="st">  ## errors</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="st">   </span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="st">  ## autocorrelations</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="st">  </span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="st">  ## self-regression (do not forget!)</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="st">'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="model-fitting-and-output" class="level2">
+<h2 class="anchored" data-anchor-id="model-fitting-and-output">Model fitting and output</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>fit_meas <span class="ot">&lt;-</span> <span class="fu">cfa</span>(meaurement_model, <span class="at">data =</span> data_clean)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit_meas, <span class="at">fit.measures =</span> <span class="cn">TRUE</span>, <span class="at">standardize =</span> F)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>lavaan 0.6-18 ended normally after 29 iterations
+
+  Estimator                                         ML
+  Optimization method                           NLMINB
+  Number of model parameters                        11
+
+  Number of observations                            87
+
+Model Test User Model:
+                                                      
+  Test statistic                                 7.470
+  Degrees of freedom                                 4
+  P-value (Chi-square)                           0.113
+
+Model Test Baseline Model:
+
+  Test statistic                               216.524
+  Degrees of freedom                                10
+  P-value                                        0.000
+
+User Model versus Baseline Model:
+
+  Comparative Fit Index (CFI)                    0.983
+  Tucker-Lewis Index (TLI)                       0.958
+
+Loglikelihood and Information Criteria:
+
+  Loglikelihood user model (H0)               -586.346
+  Loglikelihood unrestricted model (H1)       -582.612
+                                                      
+  Akaike (AIC)                                1194.693
+  Bayesian (BIC)                              1221.818
+  Sample-size adjusted Bayesian (SABIC)       1187.109
+
+Root Mean Square Error of Approximation:
+
+  RMSEA                                          0.100
+  90 Percent confidence interval - lower         0.000
+  90 Percent confidence interval - upper         0.210
+  P-value H_0: RMSEA &lt;= 0.050                    0.189
+  P-value H_0: RMSEA &gt;= 0.080                    0.687
+
+Standardized Root Mean Square Residual:
+
+  SRMR                                           0.041
+
+Parameter Estimates:
+
+  Standard errors                             Standard
+  Information                                 Expected
+  Information saturated (h1) model          Structured
+
+Latent Variables:
+                   Estimate  Std.Err  z-value  P(&gt;|z|)
+  Stress =~                                           
+    academic_wrkld    1.000                           
+    academic_prssr    1.266    0.392    3.226    0.001
+  Well_being =~                                       
+    depression        1.000                           
+    anxiety           0.882    0.074   11.909    0.000
+    isolation         0.801    0.091    8.818    0.000
+
+Covariances:
+                   Estimate  Std.Err  z-value  P(&gt;|z|)
+  Stress ~~                                           
+    Well_being        0.428    0.131    3.270    0.001
+
+Variances:
+                   Estimate  Std.Err  z-value  P(&gt;|z|)
+   .academic_wrkld    0.397    0.113    3.527    0.000
+   .academic_prssr    0.730    0.188    3.875    0.000
+   .depression        0.165    0.097    1.703    0.089
+   .anxiety           0.355    0.091    3.905    0.000
+   .isolation         0.874    0.147    5.944    0.000
+    Stress            0.325    0.132    2.464    0.014
+    Well_being        1.684    0.294    5.718    0.000</code></pre>
+</div>
+</div>
+<p>Factors constructing both latent variables show significant loadings, indicating that they contribute to the measurement of them. As can be expected, positive and significant correlation between the two latent variables.</p>
+</section>
+<section id="goodness-of-fit" class="level2">
+<h2 class="anchored" data-anchor-id="goodness-of-fit">Goodness of fit</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fitMeasures</span>(fit_meas, <span class="at">output =</span> <span class="st">"text"</span>,</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>            <span class="at">fit.measures =</span> <span class="fu">c</span>(<span class="st">"nfi"</span>,<span class="st">"nnfi"</span>,<span class="st">"tli"</span>,<span class="st">"cfi"</span>,<span class="st">"gfi"</span>,<span class="st">"rmsea"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+User Model versus Baseline Model:
+
+  Comparative Fit Index (CFI)                    0.983
+  Tucker-Lewis Index (TLI)                       0.958
+  Bentler-Bonett Non-normed Fit Index (NNFI)     0.958
+  Bentler-Bonett Normed Fit Index (NFI)          0.966
+
+Root Mean Square Error of Approximation:
+
+  RMSEA                                          0.100
+
+Other Fit Indices:
+
+  Goodness of Fit Index (GFI)                    0.969
+                                                      </code></pre>
+</div>
+</div>
+<p>Model seems to fit the data well.</p>
+<p>Comparing the measurement model to the saturated (just identified) model:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(fit_meas)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Chi-Squared Test Statistic (unscaled)
+
+          Df    AIC    BIC  Chisq Chisq diff Df diff Pr(&gt;Chisq)
+Saturated  0               0.0000                              
+Model      4 1194.7 1221.8 7.4697     7.4697       4     0.1131</code></pre>
+</div>
+</div>
+<p>Measurement model does not fit significantly better to the data than the saturated model.</p>
+<p>Using <code>modificationindices()</code> to see what changes to the model could improve it’s fit:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">modificationindices</span>(fit_meas, <span class="at">sort. =</span> <span class="cn">TRUE</span>, <span class="at">maximum.number =</span> <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                 lhs op       rhs    mi    epc sepc.lv sepc.all sepc.nox
+22 academic_workload ~~ isolation 5.487 -0.182  -0.182   -0.309   -0.309
+26        depression ~~   anxiety 3.300 -0.550  -0.550   -2.272   -2.272
+16            Stress =~ isolation 3.300 -0.586  -0.334   -0.239   -0.239
+21 academic_workload ~~   anxiety 1.478  0.068   0.068    0.180    0.180
+24 academic_pressure ~~   anxiety 1.131 -0.078  -0.078   -0.153   -0.153</code></pre>
+</div>
+</div>
+<p>It seems that estimating the covariance between <code>academic_workload</code> and <code>isolation</code>, and between <code>depression</code> and <code>anxiety</code>, as well as adding <code>isolation</code> to the measurement of <code>Stress</code> will improve model fit.</p>
+<p>Reliability of each latent variable measurement:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>semTools<span class="sc">::</span><span class="fu">reliability</span>(fit_meas)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>          Stress Well_being
+alpha  0.5887577  0.8948641
+omega  0.5969714  0.8968005
+omega2 0.5969714  0.8968005
+omega3 0.5969714  0.8941059
+avevar 0.4288314  0.7449595</code></pre>
+</div>
+</div>
+</section>
+<section id="visualization" class="level2">
+<h2 class="anchored" data-anchor-id="visualization">Visualization</h2>
+<p>Measurement of <code>Well_being</code> is more reliable than the measurement of <code>Stress</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>lay <span class="ot">&lt;-</span> <span class="fu">get_layout</span>(</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"academic_pressure"</span>, <span class="st">"academic_workload"</span>, <span class="st">"isolation"</span>, <span class="st">"anxiety"</span>, <span class="st">"depression"</span>,</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Stress"</span>, <span class="cn">NA</span>, <span class="cn">NA</span>, <span class="cn">NA</span>, <span class="st">"Well_being"</span>,</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">rows =</span> <span class="dv">2</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">graph_sem</span>(fit_meas, <span class="at">angle =</span> <span class="dv">90</span>, <span class="at">layout =</span> lay)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="final_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="hypothesis-1---mediation" class="level1">
+<h1>Hypothesis 1 - Mediation</h1>
+<p>Hypothesis 1 - A mediation model: Stress predicts bad well being, which in turn predict lower study satisfaction.</p>
+<section id="hypothesized-model" class="level2">
+<h2 class="anchored" data-anchor-id="hypothesized-model">Hypothesized model</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>hypothesized_model <span class="ot">&lt;-</span> <span class="st">'</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="st">  ## latent variable definitions (CFA)</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="st">  Stress =~ academic_workload + academic_pressure</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="st">  Well_being =~ depression + anxiety + isolation</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="st">  ## Covariances</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="st">  ## Regressions</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="st">  Well_being ~ Stress</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="st">  study_satisfaction ~ Stress + Well_being</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a><span class="st">   </span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a><span class="st">  ## effects</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a><span class="st">   </span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a><span class="st">  ## autocorrelations</span></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a><span class="st">  </span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a><span class="st">  ## self-regression (do not forget!)</span></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a><span class="st">'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>hypothesized_fit <span class="ot">&lt;-</span> <span class="fu">sem</span>(hypothesized_model, <span class="at">data =</span> data_clean)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(hypothesized_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>lavaan 0.6-18 ended normally after 32 iterations
+
+  Estimator                                         ML
+  Optimization method                           NLMINB
+  Number of model parameters                        14
+
+  Number of observations                            87
+
+Model Test User Model:
+                                                      
+  Test statistic                                 9.751
+  Degrees of freedom                                 7
+  P-value (Chi-square)                           0.203
+
+Parameter Estimates:
+
+  Standard errors                             Standard
+  Information                                 Expected
+  Information saturated (h1) model          Structured
+
+Latent Variables:
+                   Estimate  Std.Err  z-value  P(&gt;|z|)
+  Stress =~                                           
+    academic_wrkld    1.000                           
+    academic_prssr    1.189    0.366    3.245    0.001
+  Well_being =~                                       
+    depression        1.000                           
+    anxiety           0.887    0.073   12.102    0.000
+    isolation         0.806    0.090    8.915    0.000
+
+Regressions:
+                       Estimate  Std.Err  z-value  P(&gt;|z|)
+  Well_being ~                                            
+    Stress                1.264    0.394    3.210    0.001
+  study_satisfaction ~                                    
+    Stress                0.288    0.324    0.889    0.374
+    Well_being           -0.301    0.123   -2.451    0.014
+
+Variances:
+                   Estimate  Std.Err  z-value  P(&gt;|z|)
+   .academic_wrkld    0.376    0.115    3.259    0.001
+   .academic_prssr    0.762    0.183    4.163    0.000
+   .depression        0.176    0.093    1.881    0.060
+   .anxiety           0.349    0.089    3.944    0.000
+   .isolation         0.865    0.146    5.939    0.000
+   .study_satsfctn    0.971    0.152    6.403    0.000
+    Stress            0.346    0.137    2.524    0.012
+   .Well_being        1.120    0.262    4.272    0.000</code></pre>
+</div>
+</div>
+<p>Direct path - <code>Stress</code> is not significantly correlated with <code>study satisfaction</code> when controlling for <code>well being</code>.</p>
+<p>Indirect path - <code>Well being</code> is significantly correlated with <code>Stress</code>, and it is also significantly correlated with <code>study satisfaction</code>.</p>
+<section id="goodness-of-fit-1" class="level3">
+<h3 class="anchored" data-anchor-id="goodness-of-fit-1">Goodness of fit</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fitMeasures</span>(hypothesized_fit, <span class="at">output =</span> <span class="st">"text"</span>,</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>            <span class="at">fit.measures =</span> <span class="fu">c</span>(<span class="st">"nfi"</span>,<span class="st">"nnfi"</span>,<span class="st">"tli"</span>,<span class="st">"cfi"</span>,<span class="st">"gfi"</span>,<span class="st">"rmsea"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+User Model versus Baseline Model:
+
+  Comparative Fit Index (CFI)                    0.987
+  Tucker-Lewis Index (TLI)                       0.972
+  Bentler-Bonett Non-normed Fit Index (NNFI)     0.972
+  Bentler-Bonett Normed Fit Index (NFI)          0.957
+
+Root Mean Square Error of Approximation:
+
+  RMSEA                                          0.067
+
+Other Fit Indices:
+
+  Goodness of Fit Index (GFI)                    0.964
+                                                      </code></pre>
+</div>
+</div>
+<p>Good model fit.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(hypothesized_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Chi-Squared Test Statistic (unscaled)
+
+          Df    AIC    BIC  Chisq Chisq diff Df diff Pr(&gt;Chisq)
+Saturated  0               0.0000                              
+Model      7 1446.6 1481.1 9.7505     9.7505       7     0.2032</code></pre>
+</div>
+</div>
+<p>The hypothesized model is not a better fit than the saturated model.</p>
+</section>
+<section id="visualiztion" class="level3">
+<h3 class="anchored" data-anchor-id="visualiztion">Visualiztion</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>lay <span class="ot">&lt;-</span> <span class="fu">get_layout</span>(</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="cn">NA</span>, <span class="cn">NA</span>, <span class="st">"depression"</span>, <span class="st">"anxiety"</span>, <span class="st">"isolation"</span>, <span class="cn">NA</span>,</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="cn">NA</span>, <span class="cn">NA</span>, <span class="cn">NA</span>, <span class="st">"Well_being"</span>, <span class="cn">NA</span>, <span class="cn">NA</span>,</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="cn">NA</span>, <span class="st">"Stress"</span>, <span class="cn">NA</span>, <span class="cn">NA</span>, <span class="cn">NA</span>, <span class="st">"study_satisfaction"</span>,</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"academic_pressure"</span>, <span class="cn">NA</span>, <span class="st">"academic_workload"</span>, <span class="cn">NA</span>, <span class="cn">NA</span>, <span class="cn">NA</span>,</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">rows =</span> <span class="dv">4</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">graph_sem</span>(hypothesized_fit,</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">edges =</span> <span class="fu">get_edges</span>(hypothesized_fit, <span class="at">label =</span> <span class="st">"est_std"</span>),</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">angle =</span> <span class="dv">90</span>,</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>          <span class="at">layout =</span> lay)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="final_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Fixing the correlation between <code>Well_being</code> and <code>study_satisfaction</code> to 0, nullifying the indirect path.</p>
+</section>
+</section>
+<section id="restricted-model" class="level2">
+<h2 class="anchored" data-anchor-id="restricted-model">Restricted model</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>restricted_hypothesized_model <span class="ot">&lt;-</span> <span class="st">'</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="st">  ## latent variable definitions (CFA)</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="st">  Stress =~ academic_workload + academic_pressure</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="st">  Well_being =~ depression + anxiety + isolation</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="st">  ## Covariances</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="st">  Well_being ~~ 0 * study_satisfaction</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a><span class="st">  ## Regressions</span></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a><span class="st">  Well_being ~ Stress</span></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a><span class="st">  study_satisfaction ~ 0 * Well_being + Stress</span></span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a><span class="st">   </span></span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a><span class="st">  ## effects</span></span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a><span class="st">   </span></span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a><span class="st">  ## autocorrelations</span></span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a><span class="st">  </span></span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a><span class="st">  ## self-regression (do not forget!)</span></span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a><span class="st">'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>restricted_hypothesized_fit <span class="ot">&lt;-</span> <span class="fu">sem</span>(restricted_hypothesized_model, <span class="at">data =</span> data_clean)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(restricted_hypothesized_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>lavaan 0.6-18 ended normally after 30 iterations
+
+  Estimator                                         ML
+  Optimization method                           NLMINB
+  Number of model parameters                        13
+
+  Number of observations                            87
+
+Model Test User Model:
+                                                      
+  Test statistic                                15.435
+  Degrees of freedom                                 8
+  P-value (Chi-square)                           0.051
+
+Parameter Estimates:
+
+  Standard errors                             Standard
+  Information                                 Expected
+  Information saturated (h1) model          Structured
+
+Latent Variables:
+                   Estimate  Std.Err  z-value  P(&gt;|z|)
+  Stress =~                                           
+    academic_wrkld    1.000                           
+    academic_prssr    1.343    0.402    3.341    0.001
+  Well_being =~                                       
+    depression        1.000                           
+    anxiety           0.881    0.074   11.959    0.000
+    isolation         0.800    0.091    8.839    0.000
+
+Regressions:
+                       Estimate  Std.Err  z-value  P(&gt;|z|)
+  Well_being ~                                            
+    Stress                1.490    0.444    3.353    0.001
+  study_satisfaction ~                                    
+    Well_being            0.000                           
+    Stress               -0.346    0.261   -1.327    0.184
+
+Covariances:
+                   Estimate  Std.Err  z-value  P(&gt;|z|)
+ .Well_being ~~                                       
+   .study_satsfctn    0.000                           
+
+Variances:
+                   Estimate  Std.Err  z-value  P(&gt;|z|)
+   .academic_wrkld    0.433    0.105    4.129    0.000
+   .academic_prssr    0.729    0.184    3.961    0.000
+   .depression        0.164    0.096    1.708    0.088
+   .anxiety           0.357    0.090    3.945    0.000
+   .isolation         0.874    0.147    5.948    0.000
+   .study_satsfctn    1.041    0.161    6.484    0.000
+    Stress            0.289    0.120    2.414    0.016
+   .Well_being        1.042    0.265    3.927    0.000</code></pre>
+</div>
+</div>
+<section id="goodness-of-fit-2" class="level3">
+<h3 class="anchored" data-anchor-id="goodness-of-fit-2">Goodness of fit</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fitMeasures</span>(restricted_hypothesized_fit, <span class="at">output =</span> <span class="st">"text"</span>,</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>            <span class="at">fit.measures =</span> <span class="fu">c</span>(<span class="st">"nfi"</span>,<span class="st">"nnfi"</span>,<span class="st">"tli"</span>,<span class="st">"cfi"</span>,<span class="st">"gfi"</span>,<span class="st">"rmsea"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+User Model versus Baseline Model:
+
+  Comparative Fit Index (CFI)                    0.965
+  Tucker-Lewis Index (TLI)                       0.934
+  Bentler-Bonett Non-normed Fit Index (NNFI)     0.934
+  Bentler-Bonett Normed Fit Index (NFI)          0.932
+
+Root Mean Square Error of Approximation:
+
+  RMSEA                                          0.103
+
+Other Fit Indices:
+
+  Goodness of Fit Index (GFI)                    0.943
+                                                      </code></pre>
+</div>
+</div>
+<p>Comparing between the hypothesized model and the restricted model.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(restricted_hypothesized_fit, hypothesized_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Chi-Squared Difference Test
+
+                            Df    AIC    BIC   Chisq Chisq diff   RMSEA Df diff
+hypothesized_fit             7 1446.6 1481.1  9.7505                           
+restricted_hypothesized_fit  8 1450.3 1482.3 15.4352     5.6847 0.23205       1
+                            Pr(&gt;Chisq)  
+hypothesized_fit                        
+restricted_hypothesized_fit    0.01711 *
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+</section>
+<section id="visualiztion-1" class="level3">
+<h3 class="anchored" data-anchor-id="visualiztion-1">Visualiztion</h3>
+<p>The restricted model is a significantly better fit. The simpler model, without the indirect path is better.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">graph_sem</span>(restricted_hypothesized_fit,</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">edges =</span> <span class="fu">get_edges</span>(restricted_hypothesized_fit, <span class="at">label =</span> <span class="st">"est_std"</span>),</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">angle =</span> <span class="dv">90</span>,</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>          <span class="at">layout =</span> lay)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="final_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="hypothesis-2---group-analysis-interaction" class="level1">
+<h1>Hypothesis 2 - Group analysis (interaction)</h1>
+<p>Do older students deal better with stress, do the correlation between <code>Stress</code> and <code>Well_being</code> differ for different ages?</p>
+<p>Creating a categorical variable for age because <code>lavaan</code> doesn’t support interaction terms for latent variables.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>data_clean <span class="ot">&lt;-</span> data_clean <span class="sc">|&gt;</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age_cat =</span> <span class="fu">case_when</span>(age <span class="sc">&lt;</span> <span class="fu">median</span>(age) <span class="sc">~</span> <span class="st">"young"</span>,</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>                             age <span class="sc">&gt;=</span> <span class="fu">median</span>(age) <span class="sc">~</span> <span class="st">"old"</span>,</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>                             <span class="at">.default =</span> <span class="cn">NA</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="model-fitting" class="level2">
+<h2 class="anchored" data-anchor-id="model-fitting">Model fitting</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>interaction_hypothesized_model <span class="ot">&lt;-</span> <span class="st">'</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="st">  ## latent variable definitions (CFA)</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="st">  Stress =~ academic_workload + academic_pressure</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a><span class="st">  Well_being =~ depression + anxiety + isolation</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a><span class="st">  ## Covariances</span></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a><span class="st">  ## Regressions</span></span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a><span class="st">  Well_being ~ Stress</span></span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a><span class="st">   </span></span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a><span class="st">  ## effects</span></span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a><span class="st">   </span></span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a><span class="st">  ## autocorrelations</span></span>
+<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a><span class="st">  </span></span>
+<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a><span class="st">  ## self-regression (do not forget!)</span></span>
+<span id="cb36-16"><a href="#cb36-16" aria-hidden="true" tabindex="-1"></a><span class="st">'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>interaction_hypothesized_fit <span class="ot">&lt;-</span> <span class="fu">sem</span>(interaction_hypothesized_model, <span class="at">data =</span> data_clean,</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>                                    <span class="at">group =</span> <span class="st">"age_cat"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(interaction_hypothesized_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>lavaan 0.6-18 ended normally after 52 iterations
+
+  Estimator                                         ML
+  Optimization method                           NLMINB
+  Number of model parameters                        32
+
+  Number of observations per group:                   
+    old                                             53
+    young                                           34
+
+Model Test User Model:
+                                                      
+  Test statistic                                 8.946
+  Degrees of freedom                                 8
+  P-value (Chi-square)                           0.347
+  Test statistic for each group:
+    old                                          6.454
+    young                                        2.492
+
+Parameter Estimates:
+
+  Standard errors                             Standard
+  Information                                 Expected
+  Information saturated (h1) model          Structured
+
+
+Group 1 [old]:
+
+Latent Variables:
+                   Estimate  Std.Err  z-value  P(&gt;|z|)
+  Stress =~                                           
+    academic_wrkld    1.000                           
+    academic_prssr    1.331    0.639    2.085    0.037
+  Well_being =~                                       
+    depression        1.000                           
+    anxiety           0.852    0.079   10.850    0.000
+    isolation         0.772    0.109    7.059    0.000
+
+Regressions:
+                   Estimate  Std.Err  z-value  P(&gt;|z|)
+  Well_being ~                                        
+    Stress            1.070    0.500    2.138    0.033
+
+Intercepts:
+                   Estimate  Std.Err  z-value  P(&gt;|z|)
+   .academic_wrkld    3.943    0.118   33.540    0.000
+   .academic_prssr    3.774    0.157   24.028    0.000
+   .depression        3.245    0.189   17.216    0.000
+   .anxiety           3.302    0.180   18.328    0.000
+   .isolation         3.226    0.199   16.210    0.000
+
+Variances:
+                   Estimate  Std.Err  z-value  P(&gt;|z|)
+   .academic_wrkld    0.402    0.171    2.350    0.019
+   .academic_prssr    0.721    0.304    2.373    0.018
+   .depression        0.000    0.114    0.001    0.999
+   .anxiety           0.352    0.107    3.283    0.001
+   .isolation         0.977    0.202    4.848    0.000
+    Stress            0.331    0.193    1.711    0.087
+   .Well_being        1.505    0.359    4.195    0.000
+
+
+Group 2 [young]:
+
+Latent Variables:
+                   Estimate  Std.Err  z-value  P(&gt;|z|)
+  Stress =~                                           
+    academic_wrkld    1.000                           
+    academic_prssr    1.308    0.494    2.646    0.008
+  Well_being =~                                       
+    depression        1.000                           
+    anxiety           0.913    0.146    6.269    0.000
+    isolation         0.862    0.159    5.426    0.000
+
+Regressions:
+                   Estimate  Std.Err  z-value  P(&gt;|z|)
+  Well_being ~                                        
+    Stress            1.814    0.723    2.510    0.012
+
+Intercepts:
+                   Estimate  Std.Err  z-value  P(&gt;|z|)
+   .academic_wrkld    3.794    0.143   26.577    0.000
+   .academic_prssr    3.794    0.185   20.510    0.000
+   .depression        3.176    0.230   13.835    0.000
+   .anxiety           3.088    0.214   14.459    0.000
+   .isolation         3.265    0.225   14.498    0.000
+
+Variances:
+                   Estimate  Std.Err  z-value  P(&gt;|z|)
+   .academic_wrkld    0.411    0.139    2.948    0.003
+   .academic_prssr    0.680    0.234    2.901    0.004
+   .depression        0.384    0.171    2.245    0.025
+   .anxiety           0.376    0.151    2.491    0.013
+   .isolation         0.677    0.201    3.369    0.001
+    Stress            0.282    0.167    1.693    0.090
+   .Well_being        0.479    0.368    1.303    0.193</code></pre>
+</div>
+</div>
+<section id="goodness-of-fit-3" class="level3">
+<h3 class="anchored" data-anchor-id="goodness-of-fit-3">Goodness of fit</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fitMeasures</span>(interaction_hypothesized_fit, <span class="at">output =</span> <span class="st">"text"</span>,</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>            <span class="at">fit.measures =</span> <span class="fu">c</span>(<span class="st">"nfi"</span>,<span class="st">"nnfi"</span>,<span class="st">"tli"</span>,<span class="st">"cfi"</span>,<span class="st">"gfi"</span>,<span class="st">"rmsea"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+User Model versus Baseline Model:
+
+  Comparative Fit Index (CFI)                    0.995
+  Tucker-Lewis Index (TLI)                       0.989
+  Bentler-Bonett Non-normed Fit Index (NNFI)     0.989
+  Bentler-Bonett Normed Fit Index (NFI)          0.961
+
+Root Mean Square Error of Approximation:
+
+  RMSEA                                          0.052
+
+Other Fit Indices:
+
+  Goodness of Fit Index (GFI)                    0.996
+                                                      </code></pre>
+</div>
+</div>
+<p>Very good fit.</p>
+<p>Comparing to the saturated model:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(interaction_hypothesized_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Chi-Squared Test Statistic (unscaled)
+
+          Df    AIC  BIC  Chisq Chisq diff Df diff Pr(&gt;Chisq)
+Saturated  0             0.0000                              
+Model      8 1223.1 1302 8.9457     8.9457       8     0.3469</code></pre>
+</div>
+</div>
+</section>
+<section id="visualiztion-2" class="level3">
+<h3 class="anchored" data-anchor-id="visualiztion-2">Visualiztion</h3>
+<p>The model is not significantly better than the saturated model.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>lay <span class="ot">&lt;-</span> <span class="fu">get_layout</span>(<span class="cn">NA</span>, <span class="st">"Stress"</span>, <span class="cn">NA</span>, <span class="cn">NA</span>, <span class="st">"Well_being"</span>, <span class="cn">NA</span>,</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"academic_pressure"</span>, <span class="cn">NA</span>, <span class="st">"academic_workload"</span>, <span class="st">"depression"</span>, <span class="st">"anxiety"</span>, <span class="st">"isolation"</span>,</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">rows =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">graph_sem</span>(interaction_hypothesized_fit, </span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">edges =</span> <span class="fu">get_edges</span>(interaction_hypothesized_fit, <span class="at">label =</span> <span class="st">"est_std"</span>),</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">nodes =</span> <span class="fu">get_nodes</span>(interaction_hypothesized_fit, <span class="at">label =</span> <span class="st">"name"</span>),</span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>          <span class="at">layout =</span> lay,</span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>          <span class="at">angle =</span> <span class="dv">90</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="final_files/figure-html/unnamed-chunk-31-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>As hypothesized, correlation between <code>Stress</code> and <code>Well_being</code> is stronger among young students. Is it significant?</p>
+</section>
+<section id="comparison-of-parameters" class="level3">
+<h3 class="anchored" data-anchor-id="comparison-of-parameters">Comparison of parameters</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>interaction_hypothesized_model_comp <span class="ot">&lt;-</span> <span class="st">'</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="st">  ## latent variable definitions (CFA)</span></span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a><span class="st">  Stress =~ academic_workload + academic_pressure</span></span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a><span class="st">  Well_being =~ depression + anxiety + isolation</span></span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a><span class="st">  ## Covariances</span></span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a><span class="st">  ## Regressions</span></span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a><span class="st">  Well_being ~ c(Oeffect, Yeffect) * Stress</span></span>
+<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a><span class="st">  </span></span>
+<span id="cb46-11"><a href="#cb46-11" aria-hidden="true" tabindex="-1"></a><span class="st">  ## Computed estimates</span></span>
+<span id="cb46-12"><a href="#cb46-12" aria-hidden="true" tabindex="-1"></a><span class="st">  gender_effect_diff := Oeffect - Yeffect</span></span>
+<span id="cb46-13"><a href="#cb46-13" aria-hidden="true" tabindex="-1"></a><span class="st">   </span></span>
+<span id="cb46-14"><a href="#cb46-14" aria-hidden="true" tabindex="-1"></a><span class="st">  ## effects</span></span>
+<span id="cb46-15"><a href="#cb46-15" aria-hidden="true" tabindex="-1"></a><span class="st">   </span></span>
+<span id="cb46-16"><a href="#cb46-16" aria-hidden="true" tabindex="-1"></a><span class="st">  ## autocorrelations</span></span>
+<span id="cb46-17"><a href="#cb46-17" aria-hidden="true" tabindex="-1"></a><span class="st">  </span></span>
+<span id="cb46-18"><a href="#cb46-18" aria-hidden="true" tabindex="-1"></a><span class="st">  ## self-regression (do not forget!)</span></span>
+<span id="cb46-19"><a href="#cb46-19" aria-hidden="true" tabindex="-1"></a><span class="st">'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>interaction_hypothesized_fit <span class="ot">&lt;-</span> <span class="fu">sem</span>(interaction_hypothesized_model_comp, <span class="at">data =</span> data_clean,</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>                                    <span class="at">group =</span> <span class="st">"age_cat"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(interaction_hypothesized_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>lavaan 0.6-18 ended normally after 52 iterations
+
+  Estimator                                         ML
+  Optimization method                           NLMINB
+  Number of model parameters                        32
+
+  Number of observations per group:                   
+    old                                             53
+    young                                           34
+
+Model Test User Model:
+                                                      
+  Test statistic                                 8.946
+  Degrees of freedom                                 8
+  P-value (Chi-square)                           0.347
+  Test statistic for each group:
+    old                                          6.454
+    young                                        2.492
+
+Parameter Estimates:
+
+  Standard errors                             Standard
+  Information                                 Expected
+  Information saturated (h1) model          Structured
+
+
+Group 1 [old]:
+
+Latent Variables:
+                   Estimate  Std.Err  z-value  P(&gt;|z|)
+  Stress =~                                           
+    academic_wrkld    1.000                           
+    academic_prssr    1.331    0.639    2.085    0.037
+  Well_being =~                                       
+    depression        1.000                           
+    anxiety           0.852    0.079   10.850    0.000
+    isolation         0.772    0.109    7.059    0.000
+
+Regressions:
+                   Estimate  Std.Err  z-value  P(&gt;|z|)
+  Well_being ~                                        
+    Stress  (Offc)    1.070    0.500    2.138    0.033
+
+Intercepts:
+                   Estimate  Std.Err  z-value  P(&gt;|z|)
+   .academic_wrkld    3.943    0.118   33.540    0.000
+   .academic_prssr    3.774    0.157   24.028    0.000
+   .depression        3.245    0.189   17.216    0.000
+   .anxiety           3.302    0.180   18.328    0.000
+   .isolation         3.226    0.199   16.210    0.000
+
+Variances:
+                   Estimate  Std.Err  z-value  P(&gt;|z|)
+   .academic_wrkld    0.402    0.171    2.350    0.019
+   .academic_prssr    0.721    0.304    2.373    0.018
+   .depression        0.000    0.114    0.001    0.999
+   .anxiety           0.352    0.107    3.283    0.001
+   .isolation         0.977    0.202    4.848    0.000
+    Stress            0.331    0.193    1.711    0.087
+   .Well_being        1.505    0.359    4.195    0.000
+
+
+Group 2 [young]:
+
+Latent Variables:
+                   Estimate  Std.Err  z-value  P(&gt;|z|)
+  Stress =~                                           
+    academic_wrkld    1.000                           
+    academic_prssr    1.308    0.494    2.646    0.008
+  Well_being =~                                       
+    depression        1.000                           
+    anxiety           0.913    0.146    6.269    0.000
+    isolation         0.862    0.159    5.426    0.000
+
+Regressions:
+                   Estimate  Std.Err  z-value  P(&gt;|z|)
+  Well_being ~                                        
+    Stress  (Yffc)    1.814    0.723    2.510    0.012
+
+Intercepts:
+                   Estimate  Std.Err  z-value  P(&gt;|z|)
+   .academic_wrkld    3.794    0.143   26.577    0.000
+   .academic_prssr    3.794    0.185   20.510    0.000
+   .depression        3.176    0.230   13.835    0.000
+   .anxiety           3.088    0.214   14.459    0.000
+   .isolation         3.265    0.225   14.498    0.000
+
+Variances:
+                   Estimate  Std.Err  z-value  P(&gt;|z|)
+   .academic_wrkld    0.411    0.139    2.948    0.003
+   .academic_prssr    0.680    0.234    2.901    0.004
+   .depression        0.384    0.171    2.245    0.025
+   .anxiety           0.376    0.151    2.491    0.013
+   .isolation         0.677    0.201    3.369    0.001
+    Stress            0.282    0.167    1.693    0.090
+   .Well_being        0.479    0.368    1.303    0.193
+
+Defined Parameters:
+                   Estimate  Std.Err  z-value  P(&gt;|z|)
+    gendr_ffct_dff   -0.745    0.879   -0.847    0.397</code></pre>
+</div>
+</div>
+<p>Estimated parameters for young students (<span class="math inline">\(b=1.814\)</span>) and old students (<span class="math inline">\(b=1.07\)</span>) does not differ significantly (<span class="math inline">\(d=-0.745\)</span>, <span class="math inline">\(p=0.397\)</span>).</p>
+</section>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
